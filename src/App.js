@@ -135,7 +135,6 @@ const variableCollection = {
     }
   },
   "Play quiz": {
-    Score: 0,
     numberOfQuestionsAnswered: 0,
     indexOfQuizQuestionAnswered: [],
     userGivenAnswers: {
@@ -171,7 +170,7 @@ const functionsCollection = {
     const hypotenuse = Math.sqrt(
       Math.pow(base, 2) + Math.pow(height, 2)
     ).toFixed(2);
-    return `Hypotenuse - ${hypotenuse}`;
+    return `Hypotenuse = ${hypotenuse}`;
   },
   "Calculate area": {
     "If you have base and height length": (variableCollection) => {
@@ -183,7 +182,7 @@ const functionsCollection = {
         variableCollection["Calculate area"][
           "If you have base and height length"
         ]["Height"];
-      return `AREA - ${(0.5 * base * height).toFixed(2)}`;
+      return `AREA = ${(0.5 * base * height).toFixed(2)}`;
     },
     "If you have length of 3 sides": (variableCollection) => {
       const a =
@@ -200,7 +199,7 @@ const functionsCollection = {
         ];
       if (a < b + c && b < a + c && c < a + b) {
         const s = (a + b + c) / 2;
-        return `AREA - ${Math.sqrt(s * (s - a) * (s - b) * (s - c))}`;
+        return `AREA = ${Math.sqrt(s * (s - a) * (s - b) * (s - c))}`;
       } else {
         return "⚠ Enter valid side lengths such that each side length should be less than sum of other two sides";
       }
@@ -216,9 +215,12 @@ const functionsCollection = {
         score += 1;
       }
     }
-    return `Your Final Score - ${score}`;
+    return `Your Final Score : ${score}`;
   }
 };
+
+const tabOpened = [];
+const OptionForAreaSelected = [];
 
 export default function App() {
   // hooks
@@ -248,12 +250,147 @@ export default function App() {
       return response;
     }
   };
+  const getProgressfromPreviouslyOpenedTab = (previouslyOpenedTab) => {
+    let isVariableValueUpdated = false;
+    switch (previouslyOpenedTab) {
+      case "Play quiz":
+        if (variableCollection["Play quiz"].numberOfQuestionsAnswered !== 0) {
+          isVariableValueUpdated = true;
+        }
+        break;
+
+      case "Calculate area":
+        for (const variable in variableCollection[selectedTab][
+          selectedOptionForArea
+        ]) {
+          if (
+            variableCollection[selectedTab][selectedOptionForArea][variable] !==
+            0
+          ) {
+            isVariableValueUpdated = true;
+          }
+        }
+        break;
+      default:
+        for (const variable in variableCollection[selectedTab]) {
+          if (variableCollection[selectedTab][variable] !== 0) {
+            isVariableValueUpdated = true;
+          }
+        }
+        break;
+    }
+    return isVariableValueUpdated;
+  };
+  const getProgressfromPreviousOptionOfArea = (previousOptionOfArea) => {
+    let isVariableValueUpdated = false;
+    for (const variable in variableCollection[selectedTab][
+      selectedOptionForArea
+    ]) {
+      if (
+        variableCollection[selectedTab][selectedOptionForArea][variable] !== 0
+      ) {
+        isVariableValueUpdated = true;
+      }
+    }
+
+    return isVariableValueUpdated;
+  };
   // handlers
   const tabBtnClickHandler = (nameOfSelectedTab) => {
-    setSelectedTab(nameOfSelectedTab);
+    if (tabOpened.length === 0) {
+      tabOpened.push(nameOfSelectedTab);
+    } else {
+      if (tabOpened[0] !== nameOfSelectedTab) {
+        const previousTabProgress = getProgressfromPreviouslyOpenedTab(
+          tabOpened[0]
+        );
+        if (previousTabProgress) {
+          const userResponse = window.confirm(
+            `You are changing the tab and your progress on this page will no longer available are you ok with that ?`
+          );
+
+          if (userResponse) {
+            const previousTab = tabOpened.pop();
+            if (previousTab === "Calculate area") {
+              for (const variable in variableCollection[previousTab][
+                selectedOptionForArea
+              ]) {
+                variableCollection[previousTab][selectedOptionForArea][
+                  variable
+                ] = 0;
+              }
+              setSelectedOptionForArea("");
+            } else if (previousTab === "Play quiz") {
+              for (const key in variableCollection[previousTab]) {
+                switch (key) {
+                  case "indexOfQuizQuestionAnswered":
+                    variableCollection[previousTab][key].length = 0;
+                    break;
+                  case "userGivenAnswers":
+                    for (const key in variableCollection[previousTab][
+                      "userGivenAnswers"
+                    ]) {
+                      variableCollection[previousTab]["userGivenAnswers"][key] =
+                        "";
+                    }
+                    break;
+                  default:
+                    variableCollection[previousTab][key] = 0;
+                    break;
+                }
+              }
+            } else {
+              for (const variable in variableCollection[previousTab]) {
+                variableCollection[previousTab][variable] = 0;
+              }
+            }
+
+            tabOpened.push(nameOfSelectedTab);
+            setOutput("");
+          }
+        } else {
+          tabOpened.pop();
+          tabOpened.push(nameOfSelectedTab);
+          setOutput("");
+        }
+      }
+    }
+
+    setSelectedTab(tabOpened[0]);
   };
   const optionForAreaBtnClickHandler = (nameOfOptionSelectedForArea) => {
-    setSelectedOptionForArea(nameOfOptionSelectedForArea);
+    if (OptionForAreaSelected.length === 0) {
+      OptionForAreaSelected.push(nameOfOptionSelectedForArea);
+    } else {
+      if (OptionForAreaSelected[0] !== nameOfOptionSelectedForArea) {
+        const responseFromPreviousSelectedOptionForArea = getProgressfromPreviousOptionOfArea(
+          OptionForAreaSelected[0]
+        );
+
+        if (responseFromPreviousSelectedOptionForArea) {
+          const userResponse = window.confirm(
+            "You are changing option for area and your progress for current selected option will no longer available are you ok with that ?"
+          );
+          if (userResponse) {
+            const previousOptionForArea = OptionForAreaSelected.pop();
+            for (const variable in variableCollection[selectedTab][
+              previousOptionForArea
+            ]) {
+              variableCollection[selectedTab][previousOptionForArea][
+                variable
+              ] = 0;
+            }
+            OptionForAreaSelected.push(nameOfOptionSelectedForArea);
+            setOutput("");
+          }
+        } else {
+          OptionForAreaSelected.pop();
+          OptionForAreaSelected.push(nameOfOptionSelectedForArea);
+          setOutput("");
+        }
+      }
+    }
+    setSelectedOptionForArea(OptionForAreaSelected[0]);
   };
   const inputFieldChangeHandler = (e, label) => {
     if (selectedTab === "Calculate area") {
@@ -295,7 +432,7 @@ export default function App() {
         }, 1000);
       } else {
         setOutput(
-          "You have to give answers for all questions in order to check final score!"
+          "You have to give answer for all questions in order to check final score!"
         );
       }
     } else {
@@ -314,7 +451,7 @@ export default function App() {
             setOutput(result);
           }, 1000);
         } else {
-          setOutput("something wrong");
+          setOutput("Please Enter valid values");
         }
       } else {
         const variableList = Object.keys(variableCollection[selectedTab]);
@@ -326,11 +463,12 @@ export default function App() {
             setOutput(result);
           }, 1000);
         } else {
-          setOutput("something wrong");
+          setOutput("Please Enter valid values");
         }
       }
     }
   };
+  console.log(variableCollection);
   return (
     <div className="App">
       <h1>Play with triangles</h1>
