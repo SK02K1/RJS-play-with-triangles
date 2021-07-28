@@ -113,6 +113,34 @@ const tabDatabase = {
   }
 };
 
+const variableCollection = {
+  "Check angles": {
+    "First Angle": 0,
+    "Second Angle": 0,
+    "Third Angle": 0
+  },
+  "Find hypotenuse": {
+    a: 0,
+    b: 0
+  },
+  "Calculate area": {
+    "If you have base and height length": {
+      Base: 0,
+      Height: 0
+    },
+    "If you have length of 3 sides": {
+      A: 0,
+      B: 0,
+      C: 0
+    }
+  },
+  "Play quiz": {
+    Score: 0,
+    numberOfQuestionsAnswered: 0,
+    indexOfQuizQuestionAnswered: []
+  }
+};
+
 export default function App() {
   const [selectedTab, setSelectedTab] = useState("");
   const [selectedOptionForArea, setSelectedOptionForArea] = useState("");
@@ -121,6 +149,16 @@ export default function App() {
   };
   const optionForAreaBtnClickHandler = (nameOfOptionForAreaSelected) => {
     setSelectedOptionForArea(nameOfOptionForAreaSelected);
+  };
+  const inputFieldChangeHandler = (e, label) => {
+    if (selectedTab === "Calculate area") {
+      variableCollection[selectedTab][selectedOptionForArea][
+        label
+      ] = parseFloat(e.target.value);
+    } else {
+      variableCollection[selectedTab][label] = parseFloat(e.target.value);
+    }
+    console.log(variableCollection);
   };
   return (
     <div className="App">
@@ -217,6 +255,9 @@ export default function App() {
                     >
                       {parameterData.label}
                       <input
+                        onChange={(e) =>
+                          inputFieldChangeHandler(e, parameterData.label)
+                        }
                         type={tabDatabase[selectedTab].inputType}
                         min="1"
                         step="any"
@@ -261,6 +302,9 @@ export default function App() {
                     >
                       {parameterData.label}
                       <input
+                        onChange={(e) =>
+                          inputFieldChangeHandler(e, parameterData.label)
+                        }
                         type={tabDatabase["Calculate area"].inputType}
                         min="1"
                         step="any"
@@ -274,6 +318,7 @@ export default function App() {
                 })}
           </div>
           <button
+            className="main-btn"
             type="submit"
             style={
               selectedTab === "Calculate area" && selectedOptionForArea === ""
