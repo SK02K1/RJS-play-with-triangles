@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./styles.css";
+import triangle from "./assets/triangle.svg";
 
 const tabDatabase = {
   "Check angles": {
@@ -81,7 +82,7 @@ const tabDatabase = {
       {
         question:
           "6. If a triangle has 2 sides with equal lengths and 750 angle between them. What is the type of triangle?",
-        options: ["Equilateral", "Isosceles", "Right Angle traingle"],
+        options: ["Equilateral", "Isosceles", "Right Angle triangle"],
         answer: "Isosceles"
       },
       {
@@ -468,11 +469,11 @@ export default function App() {
       }
     }
   };
-  console.log(variableCollection);
   return (
     <div className="App">
       <h1>Play with triangles</h1>
-      <p className="text">
+      <img className="triangle" src={triangle} alt="shape-triangle" />
+      <p className="text-center">
         Select what you want to do with Triangle from below options{" "}
         <span
           className="emoji"
@@ -483,13 +484,13 @@ export default function App() {
         </span>
       </p>
       <form onSubmit={(e) => e.preventDefault()}>
-        <div className="tab-btn-container">
+        <div className="btn-container tab-btn-container">
           {Object.keys(tabDatabase).map((tabName) => {
             return (
               <button
                 onClick={() => tabBtnClickHandler(tabName)}
                 type="button"
-                className="tab-btn"
+                className="btn  tab-btn"
                 key={tabName}
               >
                 {tabName}
@@ -509,14 +510,14 @@ export default function App() {
           {selectedTab === "" ? (
             ""
           ) : selectedTab === "Calculate area" ? (
-            <div className="option-for-area-btn-container">
+            <div className="btn-container option-for-area-btn-container">
               {Object.keys(tabDatabase[selectedTab].optionsForArea).map(
                 (option) => {
                   return (
                     <button
                       onClick={() => optionForAreaBtnClickHandler(option)}
                       type="button"
-                      className="option-for-area-btn"
+                      className="btn btn-secondary option-for-area-btn"
                       key={option}
                     >
                       {option}
@@ -631,7 +632,7 @@ export default function App() {
           </div>
           <button
             onClick={resultBtnClickHandler}
-            className="main-btn"
+            className="main-btn btn btn-primary"
             type="submit"
             style={
               selectedTab === "Calculate area" && selectedOptionForArea === ""
@@ -641,7 +642,7 @@ export default function App() {
           >
             {selectedTab === "" ? "" : tabDatabase[selectedTab].btnText}
           </button>
-          <p className="output-container">{output}</p>
+          <p className="output-text">{output}</p>
         </div>
       </form>
     </div>
