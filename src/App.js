@@ -137,18 +137,123 @@ const variableCollection = {
   "Play quiz": {
     Score: 0,
     numberOfQuestionsAnswered: 0,
-    indexOfQuizQuestionAnswered: []
+    indexOfQuizQuestionAnswered: [],
+    userGivenAnswers: {
+      0: "",
+      1: "",
+      2: "",
+      3: "",
+      4: "",
+      5: "",
+      6: "",
+      7: "",
+      8: "",
+      9: ""
+    }
+  }
+};
+
+const functionsCollection = {
+  "Check angles": (variableCollection) => {
+    const angleOne = variableCollection["Check angles"]["First Angle"];
+    const angleTwo = variableCollection["Check angles"]["Second Angle"];
+    const angleThree = variableCollection["Check angles"]["Third Angle"];
+    const sumOfAngles = angleOne + angleTwo + angleThree;
+    if (sumOfAngles === 180) {
+      return "YAY! these angles can make a triangle";
+    } else {
+      return "Oops! these angles cannot make a triangle";
+    }
+  },
+  "Find hypotenuse": (variableCollection) => {
+    const base = variableCollection["Find hypotenuse"].a;
+    const height = variableCollection["Find hypotenuse"].b;
+    const hypotenuse = Math.sqrt(
+      Math.pow(base, 2) + Math.pow(height, 2)
+    ).toFixed(2);
+    return `Hypotenuse - ${hypotenuse}`;
+  },
+  "Calculate area": {
+    "If you have base and height length": (variableCollection) => {
+      const base =
+        variableCollection["Calculate area"][
+          "If you have base and height length"
+        ]["Base"];
+      const height =
+        variableCollection["Calculate area"][
+          "If you have base and height length"
+        ]["Height"];
+      return `AREA - ${(0.5 * base * height).toFixed(2)}`;
+    },
+    "If you have length of 3 sides": (variableCollection) => {
+      const a =
+        variableCollection["Calculate area"]["If you have length of 3 sides"][
+          "A"
+        ];
+      const b =
+        variableCollection["Calculate area"]["If you have length of 3 sides"][
+          "B"
+        ];
+      const c =
+        variableCollection["Calculate area"]["If you have length of 3 sides"][
+          "C"
+        ];
+      if (a < b + c && b < a + c && c < a + b) {
+        const s = (a + b + c) / 2;
+        return `AREA - ${Math.sqrt(s * (s - a) * (s - b) * (s - c))}`;
+      } else {
+        return "⚠ Enter valid side lengths such that each side length should be less than sum of other two sides";
+      }
+    }
+  },
+  "Play quiz": (variableCollection, tabDatabase) => {
+    let score = 0;
+    for (let i = 0; i < 10; i++) {
+      if (
+        variableCollection["Play quiz"].userGivenAnswers[i] ===
+        tabDatabase["Play quiz"].questionList[i]["answer"]
+      ) {
+        score += 1;
+      }
+    }
+    return `Your Final Score - ${score}`;
   }
 };
 
 export default function App() {
+  // hooks
   const [selectedTab, setSelectedTab] = useState("");
   const [selectedOptionForArea, setSelectedOptionForArea] = useState("");
+  const [output, setOutput] = useState("");
+  // functions
+  const checkInput = (...CurrentTabVariableList) => {
+    if (selectedTab === "Calculate area") {
+      const response = CurrentTabVariableList.every((variable) => {
+        return (
+          variableCollection[selectedTab][selectedOptionForArea][variable] >
+            0 &&
+          isNaN(
+            variableCollection[selectedTab][selectedOptionForArea][variable]
+          ) !== true
+        );
+      });
+      return response;
+    } else {
+      const response = CurrentTabVariableList.every((variable) => {
+        return (
+          variableCollection[selectedTab][variable] > 0 &&
+          isNaN(variableCollection[selectedTab][variable]) !== true
+        );
+      });
+      return response;
+    }
+  };
+  // handlers
   const tabBtnClickHandler = (nameOfSelectedTab) => {
     setSelectedTab(nameOfSelectedTab);
   };
-  const optionForAreaBtnClickHandler = (nameOfOptionForAreaSelected) => {
-    setSelectedOptionForArea(nameOfOptionForAreaSelected);
+  const optionForAreaBtnClickHandler = (nameOfOptionSelectedForArea) => {
+    setSelectedOptionForArea(nameOfOptionSelectedForArea);
   };
   const inputFieldChangeHandler = (e, label) => {
     if (selectedTab === "Calculate area") {
@@ -158,7 +263,73 @@ export default function App() {
     } else {
       variableCollection[selectedTab][label] = parseFloat(e.target.value);
     }
-    console.log(variableCollection);
+  };
+  const radioBtnChangeHandler = (optionSelected, indexOfQuestion) => {
+    if (
+      variableCollection["Play quiz"].indexOfQuizQuestionAnswered.indexOf(
+        indexOfQuestion
+      ) === -1
+    ) {
+      variableCollection["Play quiz"].indexOfQuizQuestionAnswered.push(
+        indexOfQuestion
+      );
+      variableCollection["Play quiz"].numberOfQuestionsAnswered += 1;
+    }
+    variableCollection["Play quiz"].userGivenAnswers[
+      indexOfQuestion
+    ] = optionSelected;
+  };
+  const resultBtnClickHandler = () => {
+    if (selectedTab === "Play quiz") {
+      const numberOfQuestionsAnswered =
+        variableCollection["Play quiz"].numberOfQuestionsAnswered;
+
+      if (numberOfQuestionsAnswered === 10) {
+        setOutput("Calculating Score...");
+        setTimeout(() => {
+          const finalScore = functionsCollection["Play quiz"](
+            variableCollection,
+            tabDatabase
+          );
+          setOutput(finalScore);
+        }, 1000);
+      } else {
+        setOutput(
+          "You have to give answers for all questions in order to check final score!"
+        );
+      }
+    } else {
+      if (selectedTab === "Calculate area") {
+        const variableList = Object.keys(
+          variableCollection[selectedTab][selectedOptionForArea]
+        );
+        const responseFromInputChecker = checkInput(...variableList);
+
+        if (responseFromInputChecker) {
+          const result = functionsCollection[selectedTab][
+            selectedOptionForArea
+          ](variableCollection);
+          setOutput("Calculating ...");
+          setTimeout(() => {
+            setOutput(result);
+          }, 1000);
+        } else {
+          setOutput("something wrong");
+        }
+      } else {
+        const variableList = Object.keys(variableCollection[selectedTab]);
+        const responseFromInputChecker = checkInput(...variableList);
+        if (responseFromInputChecker) {
+          const result = functionsCollection[selectedTab](variableCollection);
+          setOutput("calculating ...");
+          setTimeout(() => {
+            setOutput(result);
+          }, 1000);
+        } else {
+          setOutput("something wrong");
+        }
+      }
+    }
   };
   return (
     <div className="App">
@@ -230,6 +401,9 @@ export default function App() {
                             key={indexOfOption}
                           >
                             <input
+                              onChange={() =>
+                                radioBtnChangeHandler(option, indexOfQuestion)
+                              }
                               type={tabDatabase[selectedTab].inputType}
                               id={`question${indexOfQuestion + 1}`}
                               name={indexOfQuestion + 1}
@@ -318,6 +492,7 @@ export default function App() {
                 })}
           </div>
           <button
+            onClick={resultBtnClickHandler}
             className="main-btn"
             type="submit"
             style={
@@ -328,6 +503,7 @@ export default function App() {
           >
             {selectedTab === "" ? "" : tabDatabase[selectedTab].btnText}
           </button>
+          <p className="output-container">{output}</p>
         </div>
       </form>
     </div>
