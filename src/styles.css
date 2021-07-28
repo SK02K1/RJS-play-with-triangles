@@ -172,3 +172,38 @@ h2 {
   cursor: pointer;
   margin-right: 0.5rem;
 }
+
+@media screen and (min-width: 500px) {
+  .form-with-input-field {
+    width: 60%;
+  }
+  .triangle {
+    width: 15%;
+  }
+}
+
+@media screen and (min-width: 765px) {
+  .form-with-input-field {
+    width: 50%;
+  }
+  .triangle {
+    width: 10%;
+  }
+  .btn-container {
+    width: 60%;
+    margin: 1rem auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    border-radius: 5px;
+  }
+  .quiz-question-card {
+    width: 50%;
+  }
+}
+
+@media screen and (min-width: 1125px) {
+  .form-with-input-field {
+    width: 30%;
+  }
+}
