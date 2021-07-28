@@ -116,6 +116,27 @@ export default function App() {
   return (
     <div className="App">
       <h1>Play with triangles</h1>
+      <p className="text">
+        Select what you want to do with Triangle from below options{" "}
+        <span
+          className="emoji"
+          role="img"
+          aria-label="back hand index finger pointing down"
+        >
+          👇
+        </span>
+      </p>
+      <form>
+        <div className="tab-btn-container">
+          {Object.keys(tabDatabase).map((tabName) => {
+            return (
+              <button className="tab-btn" key={tabName}>
+                {tabName}
+              </button>
+            );
+          })}
+        </div>
+      </form>
     </div>
   );
 }
