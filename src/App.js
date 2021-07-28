@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./styles.css";
 
 const tabDatabase = {
@@ -113,6 +114,10 @@ const tabDatabase = {
 };
 
 export default function App() {
+  const [selectedTab, setSelectedTab] = useState("");
+  const tabBtnClickHandler = (nameOfSelectedTab) => {
+    setSelectedTab(nameOfSelectedTab);
+  };
   return (
     <div className="App">
       <h1>Play with triangles</h1>
@@ -126,16 +131,22 @@ export default function App() {
           👇
         </span>
       </p>
-      <form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <div className="tab-btn-container">
           {Object.keys(tabDatabase).map((tabName) => {
             return (
-              <button className="tab-btn" key={tabName}>
+              <button
+                onClick={() => tabBtnClickHandler(tabName)}
+                className="tab-btn"
+                key={tabName}
+              >
                 {tabName}
               </button>
             );
           })}
         </div>
+        <hr />
+        <h2>{selectedTab}</h2>
       </form>
     </div>
   );
