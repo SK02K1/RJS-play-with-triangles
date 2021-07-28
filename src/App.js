@@ -115,8 +115,12 @@ const tabDatabase = {
 
 export default function App() {
   const [selectedTab, setSelectedTab] = useState("");
+  const [selectedOptionForArea, setSelectedOptionForArea] = useState("");
   const tabBtnClickHandler = (nameOfSelectedTab) => {
     setSelectedTab(nameOfSelectedTab);
+  };
+  const optionForAreaBtnClickHandler = (nameOfOptionForAreaSelected) => {
+    setSelectedOptionForArea(nameOfOptionForAreaSelected);
   };
   return (
     <div className="App">
@@ -137,6 +141,7 @@ export default function App() {
             return (
               <button
                 onClick={() => tabBtnClickHandler(tabName)}
+                type="button"
                 className="tab-btn"
                 key={tabName}
               >
@@ -146,7 +151,139 @@ export default function App() {
           })}
         </div>
         <hr />
-        <h2>{selectedTab}</h2>
+        <div
+          style={
+            selectedTab === "" ? { display: "none" } : { display: "block" }
+          }
+          className="main-form-container"
+        >
+          <h2>{selectedTab}</h2>
+          <h3>{selectedTab === "" ? "" : tabDatabase[selectedTab].heading}</h3>
+          {selectedTab === "" ? (
+            ""
+          ) : selectedTab === "Calculate area" ? (
+            <div className="option-for-area-btn-container">
+              {Object.keys(tabDatabase[selectedTab].optionsForArea).map(
+                (option) => {
+                  return (
+                    <button
+                      onClick={() => optionForAreaBtnClickHandler(option)}
+                      type="button"
+                      className="option-for-area-btn"
+                      key={option}
+                    >
+                      {option}
+                    </button>
+                  );
+                }
+              )}
+            </div>
+          ) : selectedTab === "Play quiz" ? (
+            <div className="quiz-form">
+              {tabDatabase[selectedTab].questionList.map(
+                (questionData, indexOfQuestion) => {
+                  return (
+                    <div className="quiz-question-card" key={indexOfQuestion}>
+                      <p>{questionData.question}</p>
+                      {questionData.options.map((option, indexOfOption) => {
+                        return (
+                          <label
+                            htmlFor={`question${indexOfQuestion + 1}`}
+                            key={indexOfOption}
+                          >
+                            <input
+                              type={tabDatabase[selectedTab].inputType}
+                              id={`question${indexOfQuestion + 1}`}
+                              name={indexOfQuestion + 1}
+                              required
+                            />
+                            {option}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          ) : (
+            <div className="form-with-input-field">
+              {tabDatabase[selectedTab].inputFieldsRequired.map(
+                (parameterData) => {
+                  return (
+                    <label
+                      key={parameterData.placeholder}
+                      htmlFor={parameterData.label}
+                    >
+                      {parameterData.label}
+                      <input
+                        type={tabDatabase[selectedTab].inputType}
+                        min="1"
+                        step="any"
+                        id={parameterData.label}
+                        name={parameterData.label}
+                        placeholder={parameterData.placeholder}
+                        required
+                      />
+                    </label>
+                  );
+                }
+              )}
+            </div>
+          )}
+
+          <h4
+            style={
+              selectedTab === "Calculate area"
+                ? { display: "block" }
+                : { display: "none" }
+            }
+          >
+            {selectedOptionForArea}
+          </h4>
+          <div
+            className="form-with-input-field area-form"
+            style={
+              selectedTab === "Calculate area" && selectedOptionForArea !== ""
+                ? { display: "block" }
+                : { display: "none" }
+            }
+          >
+            {selectedOptionForArea === ""
+              ? ""
+              : tabDatabase["Calculate area"].optionsForArea[
+                  selectedOptionForArea
+                ].inputFieldsRequired.map((parameterData) => {
+                  return (
+                    <label
+                      key={parameterData.label}
+                      htmlFor={parameterData.label}
+                    >
+                      {parameterData.label}
+                      <input
+                        type={tabDatabase["Calculate area"].inputType}
+                        min="1"
+                        step="any"
+                        id={parameterData.label}
+                        name={parameterData.label}
+                        placeholder={parameterData.placeholder}
+                        required
+                      />
+                    </label>
+                  );
+                })}
+          </div>
+          <button
+            type="submit"
+            style={
+              selectedTab === "Calculate area" && selectedOptionForArea === ""
+                ? { display: "none" }
+                : { display: "block" }
+            }
+          >
+            {selectedTab === "" ? "" : tabDatabase[selectedTab].btnText}
+          </button>
+        </div>
       </form>
     </div>
   );
