@@ -536,7 +536,7 @@ export default function App() {
                       {questionData.options.map((option, indexOfOption) => {
                         return (
                           <label
-                            htmlFor={`question${indexOfQuestion + 1}`}
+                            htmlFor={`ques${indexOfQuestion + 1} :  ${option}`}
                             key={indexOfOption}
                           >
                             <input
@@ -544,7 +544,7 @@ export default function App() {
                                 radioBtnChangeHandler(option, indexOfQuestion)
                               }
                               type={tabDatabase[selectedTab].inputType}
-                              id={`question${indexOfQuestion + 1}`}
+                              id={`ques${indexOfQuestion + 1} :  ${option}`}
                               name={indexOfQuestion + 1}
                               required
                             />
