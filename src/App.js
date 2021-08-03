@@ -138,17 +138,48 @@ const variableCollection = {
   "Play quiz": {
     numberOfQuestionsAnswered: 0,
     indexOfQuizQuestionAnswered: [],
+    changeQuizCardColor: false,
     userGivenAnswers: {
-      0: "",
-      1: "",
-      2: "",
-      3: "",
-      4: "",
-      5: "",
-      6: "",
-      7: "",
-      8: "",
-      9: ""
+      0: {
+        answer: "",
+        answerStatus: ""
+      },
+      1: {
+        answer: "",
+        answerStatus: ""
+      },
+      2: {
+        answer: "",
+        answerStatus: ""
+      },
+      3: {
+        answer: "",
+        answerStatus: ""
+      },
+      4: {
+        answer: "",
+        answerStatus: ""
+      },
+      5: {
+        answer: "",
+        answerStatus: ""
+      },
+      6: {
+        answer: "",
+        answerStatus: ""
+      },
+      7: {
+        answer: "",
+        answerStatus: ""
+      },
+      8: {
+        answer: "",
+        answerStatus: ""
+      },
+      9: {
+        answer: "",
+        answerStatus: ""
+      }
     }
   }
 };
@@ -210,10 +241,14 @@ const functionsCollection = {
     let score = 0;
     for (let i = 0; i < 10; i++) {
       if (
-        variableCollection["Play quiz"].userGivenAnswers[i] ===
+        variableCollection["Play quiz"].userGivenAnswers[i]["answer"] ===
         tabDatabase["Play quiz"].questionList[i]["answer"]
       ) {
+        variableCollection["Play quiz"].userGivenAnswers[i].answerStatus =
+          "correct";
         score += 1;
+      } else {
+        variableCollection["Play quiz"].userGivenAnswers[i].answerStatus = "";
       }
     }
     return `Your Final Score : ${score}`;
@@ -328,12 +363,19 @@ export default function App() {
                     variableCollection[previousTab][key].length = 0;
                     break;
                   case "userGivenAnswers":
-                    for (const key in variableCollection[previousTab][
+                    for (const index in variableCollection[previousTab][
                       "userGivenAnswers"
                     ]) {
-                      variableCollection[previousTab]["userGivenAnswers"][key] =
-                        "";
+                      variableCollection[previousTab]["userGivenAnswers"][
+                        index
+                      ].answer = "";
+                      variableCollection[previousTab]["userGivenAnswers"][
+                        index
+                      ].answerStatus = "";
                     }
+                    break;
+                  case "changeQuizCardColor":
+                    variableCollection[previousTab].changeQuizCardColor = false;
                     break;
                   default:
                     variableCollection[previousTab][key] = 0;
@@ -413,8 +455,8 @@ export default function App() {
       );
       variableCollection["Play quiz"].numberOfQuestionsAnswered += 1;
     }
-    variableCollection["Play quiz"].userGivenAnswers[
-      indexOfQuestion
+    variableCollection["Play quiz"].userGivenAnswers[indexOfQuestion][
+      "answer"
     ] = optionSelected;
   };
   const resultBtnClickHandler = () => {
@@ -423,12 +465,14 @@ export default function App() {
         variableCollection["Play quiz"].numberOfQuestionsAnswered;
 
       if (numberOfQuestionsAnswered === 10) {
+        variableCollection["Play quiz"].changeQuizCardColor = false;
         setOutput("Calculating Score...");
         setTimeout(() => {
           const finalScore = functionsCollection["Play quiz"](
             variableCollection,
             tabDatabase
           );
+          variableCollection["Play quiz"].changeQuizCardColor = true;
           setOutput(finalScore);
         }, 1000);
       } else {
@@ -531,7 +575,20 @@ export default function App() {
               {tabDatabase[selectedTab].questionList.map(
                 (questionData, indexOfQuestion) => {
                   return (
-                    <div className="quiz-question-card" key={indexOfQuestion}>
+                    <div
+                      style={
+                        variableCollection["Play quiz"].changeQuizCardColor ===
+                        false
+                          ? {}
+                          : variableCollection["Play quiz"].userGivenAnswers[
+                              indexOfQuestion
+                            ].answerStatus === "correct"
+                          ? { backgroundColor: "green" }
+                          : { backgroundColor: "red" }
+                      }
+                      className="quiz-question-card"
+                      key={indexOfQuestion}
+                    >
                       <p>{questionData.question}</p>
                       {questionData.options.map((option, indexOfOption) => {
                         return (
