@@ -1,2 +1,5 @@
 # RJS-play-with-triangles
-Created with CodeSandbox
+
+App in React JS to make learning about triangles fun.
+
+[Live Project](https://utkh2.csb.app/)
